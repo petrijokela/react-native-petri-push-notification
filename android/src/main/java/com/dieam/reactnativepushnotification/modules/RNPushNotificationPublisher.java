@@ -173,7 +173,7 @@ public class RNPushNotificationPublisher extends BroadcastReceiver {
                                     String cleared = notification.getString("cleared");
                                     String ncAlarm =  cleared.equals("true")?"Alarm Reset":"New Alarm";
                                     msg = notification.getString("name") + ": " + (cleared.equals("true")?notification.getString("reset_text"):notification.getString("active_text"));
-                                    title =  "<p><span style='color:"+ (priority.equals("true") ? red : black) + "'>" + ncAlarm + "</span>    <span style='color:lightgray'>" + getMyPrettyDate(notification.getLong("active_time")*1000) + "</span></p>";
+                                    title =  "<p><span style='color:"+ (priority.equals("true") ? red : black) + "'>" + ncAlarm + "</span>    <span style='color:lightgray'>" + getMyPrettyDate((notification.getLong("active_time") + (cleared.equals("true")?notification.getLong("active_duration"):0))*1000) + "</span></p>";
                                     bundle.putString("actionType", "alarm");
                                 }
                                 String objectId = notification.getString("id");
