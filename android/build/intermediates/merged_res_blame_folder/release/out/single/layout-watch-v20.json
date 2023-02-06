@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.dieam.reactnativepushnotification.react-native-push-notification-merged_res-21:/layout-watch-v20/abc_alert_dialog_title_material.xml",
+        "source": "com.dieam.reactnativepushnotification.react-native-push-notification-appcompat-1.4.1-1:/layout-watch-v20/abc_alert_dialog_title_material.xml"
+    },
+    {
+        "merged": "com.dieam.reactnativepushnotification.react-native-push-notification-merged_res-21:/layout-watch-v20/abc_alert_dialog_button_bar_material.xml",
+        "source": "com.dieam.reactnativepushnotification.react-native-push-notification-appcompat-1.4.1-1:/layout-watch-v20/abc_alert_dialog_button_bar_material.xml"
+    }
+]
