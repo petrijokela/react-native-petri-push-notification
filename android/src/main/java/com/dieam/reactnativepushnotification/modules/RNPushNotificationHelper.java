@@ -200,8 +200,23 @@ public class RNPushNotificationHelper {
     public void sendToNotificationCentreWithPicture(Bundle bundle, Bitmap largeIconBitmap, Bitmap bigPictureBitmap, Bitmap bigLargeIconBitmap) {
         try {
             
-            if(bundle.getString("showFlag") == "false")
+            if(bundle.getString("title").equals("xyz"))
             {
+                // Remove the notification from the shared preferences once it has been shown
+                // to avoid showing the notification again when the phone is rebooted. If the
+                // notification is not removed, then every time the phone is rebooted, we will
+                // try to reschedule all the notifications stored in shared preferences and since
+                // these notifications will be in the past time, they will be shown immediately
+                // to the user which we shouldn't do. So, remove the notification from the shared
+                // preferences once it has been shown to the user. If it is a repeating notification
+                // it will be scheduled again.
+                if (scheduledNotificationsPersistence.getString(bundle.getString("oldId"), null) != null) {
+                    Log.e(LOG_TAG, "removeid" + bundle.getString("oldId"));
+                    SharedPreferences.Editor editor = scheduledNotificationsPersistence.edit();
+                    editor.remove(bundle.getString("oldId"));
+                    editor.apply();
+                }
+                Log.e(LOG_TAG, "ifrepeat" + bundle.toString());
                 this.scheduleNextNotificationIfRepeating(bundle);
                 return;
             }
@@ -575,6 +590,8 @@ public class RNPushNotificationHelper {
                 }
 
             }
+
+            
 
             
 

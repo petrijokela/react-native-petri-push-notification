@@ -60,9 +60,9 @@ public class RNPushNotificationPublisher extends BroadcastReceiver {
     private void handleLocalNotification(Context context, Bundle bundle) {
 
         // If notification ID is not provided by the user for push notification, generate one at random
-        
         SecureRandom randomNumberGenerator = new SecureRandom();
         bundle.putString("id", String.valueOf(randomNumberGenerator.nextInt()));
+        
 
         Application applicationContext = (Application) context.getApplicationContext();
         RNPushNotificationHelper pushNotificationHelper = new RNPushNotificationHelper(applicationContext);
@@ -112,7 +112,10 @@ public class RNPushNotificationPublisher extends BroadcastReceiver {
     public void monitorServer(Context context, Bundle bundle) {
         String serverurl = bundle.getString("serverurl");
         String userToken = bundle.getString("userToken");
-        
+        if(serverurl.equals("") || userToken.equals("")){
+            Log.v(LOG_TAG, "serverurl or usertoken is null");
+            return;
+        }
         String messageString = "";
 
         OkHttpClient client = new OkHttpClient().newBuilder()
@@ -176,15 +179,9 @@ public class RNPushNotificationPublisher extends BroadcastReceiver {
                                     title =  "<p><span style='color:"+ (priority.equals("true") ? red : black) + "'>" + ncAlarm + "</span>    <span style='color:lightgray'>" + getMyPrettyDate((notification.getLong("active_time") + (cleared.equals("true")?notification.getLong("active_duration"):0))*1000) + "</span></p>";
                                     bundle.putString("actionType", "alarm");
                                 }
+                                //object id: DataProvider.onNotification eventid or alarmid
                                 String objectId = notification.getString("id");
                                 bundle.putString("objectId", objectId);
-                                String hasPermission = bundle.getString("hasPermission");
-                                bundle.putString("showFlag", hasPermission.equals("true") ? "true" : "false");
-                                bundle.putString("soundName", 
-                                    priority.equals("true") ? bundle.getString("soundNameHigh") : bundle.getString("soundNameNormal"));
-                                if(!bundle.getBoolean("playSound")){
-                                    bundle.putString("soundName", "");
-                                }
                                 bundle.putString("channelId", priority.equals("true") ? "fusion-high-channel-0113" : "fusion-normal-channel-0113");
                                 if(priority.equals("true")){
                                     bundle.putString("smallIcon", isDarkThemeOn?"white_priority": "black_priority");
@@ -192,9 +189,6 @@ public class RNPushNotificationPublisher extends BroadcastReceiver {
                                 else{
                                     bundle.putString("smallIcon", isDarkThemeOn?"white": "black");
                                 }
-                                // boolean priority = notification.getBoolean("priority");
-                                // bundle.putString("soundName", 
-                                //     priority ? bundle.getString("soundNameHigh") : bundle.getString("soundNameNormal"));
                                 bundle.putString("title", title);
                                 bundle.putString("message", msg);
                                 handleLocalNotification(context, bundle);       
@@ -208,7 +202,8 @@ public class RNPushNotificationPublisher extends BroadcastReceiver {
                 }
                 
                 
-                bundle.putString("showFlag", "false");
+                bundle.putString("title", "xyz");
+                bundle.putString("oldId", bundle.getString("id"));
                 handleLocalNotification(context, bundle);
                 
             }

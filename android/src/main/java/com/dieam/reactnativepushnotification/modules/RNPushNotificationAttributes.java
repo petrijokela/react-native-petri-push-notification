@@ -54,6 +54,8 @@ public class RNPushNotificationAttributes {
     private static final String ALLOW_WHILE_IDLE = "allowWhileIdle";
     private static final String IGNORE_IN_FOREGROUND = "ignoreInForeground";
     private static final String USER_INFO = "userInfo";
+    private static final String SERVERURL = "serverurl";
+    private static final String USER_TOKEN = "userToken";
 
     private final String id;
     private final String message;
@@ -94,6 +96,8 @@ public class RNPushNotificationAttributes {
     private final boolean allowWhileIdle;
     private final boolean ignoreInForeground;
     private final String userInfo;
+    private final String serverurl;
+    private final String userToken;
 
     public RNPushNotificationAttributes(Bundle bundle) {
         id = bundle.getString(ID);
@@ -135,6 +139,8 @@ public class RNPushNotificationAttributes {
         allowWhileIdle = bundle.getBoolean(ALLOW_WHILE_IDLE);
         ignoreInForeground = bundle.getBoolean(IGNORE_IN_FOREGROUND);
         userInfo = bundle.getString(USER_INFO);
+        serverurl = bundle.getString(SERVERURL);
+        userToken = bundle.getString(USER_TOKEN);
     }
 
     private RNPushNotificationAttributes(JSONObject jsonObject) {
@@ -178,6 +184,8 @@ public class RNPushNotificationAttributes {
             allowWhileIdle = jsonObject.has(ALLOW_WHILE_IDLE) ? jsonObject.getBoolean(ALLOW_WHILE_IDLE) : false;
             ignoreInForeground = jsonObject.has(IGNORE_IN_FOREGROUND) ? jsonObject.getBoolean(IGNORE_IN_FOREGROUND) : false;
             userInfo = jsonObject.has(USER_INFO) ? jsonObject.getString(USER_INFO) : null;
+            serverurl = jsonObject.has(SERVERURL) ? jsonObject.getString(SERVERURL) : null;
+            userToken = jsonObject.has(USER_TOKEN) ? jsonObject.getString(USER_TOKEN) : null;
         } catch (JSONException e) {
             throw new IllegalStateException("Exception while initializing RNPushNotificationAttributes from JSON", e);
         }
@@ -231,6 +239,8 @@ public class RNPushNotificationAttributes {
         bundle.putBoolean(ALLOW_WHILE_IDLE, allowWhileIdle);
         bundle.putBoolean(IGNORE_IN_FOREGROUND, ignoreInForeground);
         bundle.putString(USER_INFO, userInfo);
+        bundle.putString(USER_TOKEN, userToken);
+        bundle.putString(SERVERURL, serverurl);
         return bundle;
     }
 
@@ -276,6 +286,8 @@ public class RNPushNotificationAttributes {
             jsonObject.put(ALLOW_WHILE_IDLE, allowWhileIdle);
             jsonObject.put(IGNORE_IN_FOREGROUND, ignoreInForeground);
             jsonObject.put(USER_INFO, userInfo);
+            jsonObject.put(USER_TOKEN, userToken);
+            jsonObject.put(SERVERURL, serverurl);
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Exception while converting RNPushNotificationAttributes to " +
                     "JSON. Returning an empty object", e);
@@ -327,6 +339,8 @@ public class RNPushNotificationAttributes {
                 ", allowWhileIdle=" + allowWhileIdle +
                 ", ignoreInForeground=" + ignoreInForeground +
                 ", userInfo=" + userInfo +
+                ", userToken=" + userToken +
+                ", serverurl=" + serverurl +
                 '}';
     }
 
