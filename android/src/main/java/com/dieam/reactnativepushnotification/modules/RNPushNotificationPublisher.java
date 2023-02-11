@@ -182,12 +182,26 @@ public class RNPushNotificationPublisher extends BroadcastReceiver {
                                 //object id: DataProvider.onNotification eventid or alarmid
                                 String objectId = notification.getString("id");
                                 bundle.putString("objectId", objectId);
-                                bundle.putString("channelId", priority.equals("true") ? "fusion-high-channel-0113" : "fusion-normal-channel-0113");
+                                //this soundName is for lower than 26
                                 if(priority.equals("true")){
+                                    bundle.putString("soundName", "priority.wav");
                                     bundle.putString("smallIcon", isDarkThemeOn?"white_priority": "black_priority");
                                 }
                                 else{
+                                    bundle.putString("soundName", "normal.wav");
                                     bundle.putString("smallIcon", isDarkThemeOn?"white": "black");
+                                }
+                                //this soundName is for higher than 26
+                                if(bundle.getBoolean("playSound")){
+                                    if(priority.equals("true")){
+                                        bundle.putString("channelId", "fusion-sound-priority-0113");
+                                    }
+                                    else{
+                                        bundle.putString("channelId", "fusion-sound-normal-0113");
+                                    }
+                                }
+                                else{
+                                    bundle.putString("channelId", "fusion-mute-0113");   
                                 }
                                 bundle.putString("title", title);
                                 bundle.putString("message", msg);
