@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.util.Log;
 
 import java.util.Set;
@@ -31,15 +32,16 @@ public class RNPushNotificationBootEventReceiver extends BroadcastReceiver {
                 String notificationAttributesJson = sharedPreferences.getString(id, null);
                 if (notificationAttributesJson != null) {
                     RNPushNotificationAttributes notificationAttributes = RNPushNotificationAttributes.fromJson(notificationAttributesJson);
-
+                    Bundle bundle = notificationAttributes.toBundle();
                     if (notificationAttributes.getFireDate() < System.currentTimeMillis()) {
                         Log.i(LOG_TAG, "RNPushNotificationBootEventReceiver: Showing notification for " +
                                 notificationAttributes.getId());
-                        rnPushNotificationHelper.sendToNotificationCentre(notificationAttributes.toBundle());
+                        bundle.putDouble("fireDate", System.currentTimeMillis() + 10 * 1000);
+                        rnPushNotificationHelper.sendNotificationScheduledInit(bundle);
                     } else {
                         Log.i(LOG_TAG, "RNPushNotificationBootEventReceiver: Scheduling notification for " +
                                 notificationAttributes.getId());
-                        rnPushNotificationHelper.sendNotificationScheduledCore(notificationAttributes.toBundle());
+                        rnPushNotificationHelper.sendNotificationScheduledInit(notificationAttributes.toBundle());
                     }
                 }
             } catch (Exception e) {

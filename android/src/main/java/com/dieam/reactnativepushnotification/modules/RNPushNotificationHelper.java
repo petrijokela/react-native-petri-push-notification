@@ -119,6 +119,26 @@ public class RNPushNotificationHelper {
         return null;
     }
 
+    public void sendNotificationScheduledInit(Bundle bundle) {
+        
+        RNPushNotificationAttributes notificationAttributes = new RNPushNotificationAttributes(bundle);
+        String id = notificationAttributes.getId();
+
+
+        Log.d(LOG_TAG, "Storing push notification with id " + id);
+
+        SharedPreferences.Editor editor = scheduledNotificationsPersistence.edit();
+        editor.putString(id, notificationAttributes.toJson().toString());
+        editor.apply();
+
+        boolean isSaved = scheduledNotificationsPersistence.contains(id);
+        if (!isSaved) {
+            Log.e(LOG_TAG, "Failed to save " + id);
+        }
+
+        sendNotificationScheduled(bundle);
+    }
+
     public void sendNotificationScheduled(Bundle bundle) {
         Class intentClass = getMainActivityClass();
         if (intentClass == null) {
@@ -140,20 +160,6 @@ public class RNPushNotificationHelper {
         if (fireDate == 0) {
             Log.e(LOG_TAG, "No date specified for the scheduled notification");
             return;
-        }
-
-        RNPushNotificationAttributes notificationAttributes = new RNPushNotificationAttributes(bundle);
-        String id = notificationAttributes.getId();
-
-        Log.d(LOG_TAG, "Storing push notification with id " + id);
-
-        SharedPreferences.Editor editor = scheduledNotificationsPersistence.edit();
-        editor.putString(id, notificationAttributes.toJson().toString());
-        editor.apply();
-
-        boolean isSaved = scheduledNotificationsPersistence.contains(id);
-        if (!isSaved) {
-            Log.e(LOG_TAG, "Failed to save " + id);
         }
 
         sendNotificationScheduledCore(bundle);
@@ -210,12 +216,12 @@ public class RNPushNotificationHelper {
                 // to the user which we shouldn't do. So, remove the notification from the shared
                 // preferences once it has been shown to the user. If it is a repeating notification
                 // it will be scheduled again.
-                if (scheduledNotificationsPersistence.getString(bundle.getString("oldId"), null) != null) {
-                    Log.e(LOG_TAG, "removeid" + bundle.getString("oldId"));
-                    SharedPreferences.Editor editor = scheduledNotificationsPersistence.edit();
-                    editor.remove(bundle.getString("oldId"));
-                    editor.apply();
-                }
+                // if (scheduledNotificationsPersistence.getString(bundle.getString("oldId"), null) != null) {
+                //     Log.e(LOG_TAG, "removeid" + bundle.getString("oldId"));
+                //     SharedPreferences.Editor editor = scheduledNotificationsPersistence.edit();
+                //     editor.remove(bundle.getString("oldId"));
+                //     editor.apply();
+                // }
                 Log.e(LOG_TAG, "ifrepeat" + bundle.toString());
                 this.scheduleNextNotificationIfRepeating(bundle);
                 return;
@@ -465,7 +471,12 @@ public class RNPushNotificationHelper {
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notification.setCategory(NotificationCompat.CATEGORY_CALL);
+                //if(bundle.getString("channelId").equals("fusion-sound-priority-0113")){
+                    notification.setCategory(NotificationCompat.CATEGORY_ALARM);
+                // }
+                // else{
+                //     notification.setCategory(NotificationCompat.CATEGORY_CALL);
+                // }
 
                 String color = bundle.getString("color");
                 int defaultColor = this.config.getNotificationColor();
@@ -639,7 +650,7 @@ public class RNPushNotificationHelper {
 
             long newFireDate;
             if ("time".equals(repeatType)) {
-                newFireDate = fireDate + repeatTime;
+                newFireDate = System.currentTimeMillis() + repeatTime;
             } else {
                 int repeatField = getRepeatField(repeatType);
 
@@ -678,7 +689,7 @@ public class RNPushNotificationHelper {
         }
     }
 
-    private Uri getSoundUri(String soundName) {
+    public Uri getSoundUri(String soundName) {
         if (soundName == null || "default".equalsIgnoreCase(soundName)) {
             return RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         } else {

@@ -39,7 +39,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 public class RNPushNotification extends ReactContextBaseJavaModule implements ActivityEventListener {
-    public static final String LOG_TAG = "RNPushNotification";// all logging should use this tag
+    public static final String LOG_TAG = "FusionMobileNotification";// all logging should use this tag
     public static final String KEY_TEXT_REPLY = "key_text_reply";
 
     public interface RNIntentHandler {
@@ -180,7 +180,7 @@ public class RNPushNotification extends ReactContextBaseJavaModule implements Ac
         if (bundle.getString("id") == null) {
             bundle.putString("id", String.valueOf(mRandomNumberGenerator.nextInt()));
         }
-        mRNPushNotificationHelper.sendNotificationScheduled(bundle);
+        mRNPushNotificationHelper.sendNotificationScheduledInit(bundle);
     }
 
     @ReactMethod
