@@ -173,13 +173,23 @@ public class RNPushNotificationPublisher extends BroadcastReceiver {
                         boolean vibrate = bundle.getBoolean("vibrate");
                         JSONObject jsonObject = new JSONObject(s);
                         if(jsonObject.has("error")){
-                            bundle.putString("title", "Server Error: " + getMyPrettyDate(System.currentTimeMillis()));
-                            bundle.putString("message", "Error");
-                            bundle.putString("channelId", "fusion-mute-0113");   
-                            bundle.putString("smallIcon", isDarkThemeOn?"white": "black");
-                            handleLocalNotification(context, bundle);       
+                            int serverErrorCount = 0;
+                            if(bundle.containsKey("serverErrorCount")){
+                                serverErrorCount = bundle.getInt("serverErrorCount");
+                            }
+                            serverErrorCount ++;
+                            bundle.putInt("serverErrorCount", serverErrorCount);
+                            if(serverErrorCount == 1){
+                                bundle.putString("soundName", "normal.wav");
+                                bundle.putString("channelId", "fusion-sound-normal-0113");
+                                bundle.putString("title", "Server Error: Access Denied  " + getMyPrettyDate(System.currentTimeMillis()));
+                                bundle.putString("message", "");
+                                bundle.putString("subText", "");
+                                bundle.putString("smallIcon", isDarkThemeOn?"white": "black");
+                                handleLocalNotification(context, bundle);    
+                            } 
                         }
-                        else if(jsonObject.has("notifications")) {
+                        if(jsonObject.has("notifications")) {
                             String notifications = jsonObject.getString("notifications");
                             JSONArray notifArr = new JSONArray(notifications);
                             boolean hasPriority = false;
@@ -205,6 +215,7 @@ public class RNPushNotificationPublisher extends BroadcastReceiver {
                                     msg = notification.getString("message");
                                     title =  "<p><span style='color:" + (priority.equals("true") ? red : black) + "'>New Message</span>    <span style='color:lightgray'>" + getMyPrettyDate(notification.getLong("queue_time")* 1000) + "</span></p>";
                                     bundle.putString("actionType", "user_event");
+                                    bundle.putString("subText", notification.getString("from_user"));
                                 }
                                 else if(type.equals("active_alarm")) {
                                     String cleared = notification.getString("cleared");
@@ -212,6 +223,7 @@ public class RNPushNotificationPublisher extends BroadcastReceiver {
                                     msg = notification.getString("name") + ": " + (cleared.equals("true")?notification.getString("reset_text"):notification.getString("active_text"));
                                     title =  "<p><span style='color:"+ (priority.equals("true") ? red : black) + "'>" + ncAlarm + "</span>    <span style='color:lightgray'>" + getMyPrettyDate((notification.getLong("active_time") + (cleared.equals("true")?notification.getLong("active_duration"):0))*1000) + "</span></p>";
                                     bundle.putString("actionType", "active_alarm");
+                                    bundle.putString("subText", "");
                                 }else{
                                     continue;
                                 }
@@ -261,17 +273,42 @@ public class RNPushNotificationPublisher extends BroadcastReceiver {
                     } catch (Exception e) {
                         Log.v(LOG_TAG, "responseexception" + e.toString());
                     }
+                    int errorCount = 0;
+                    if(bundle.containsKey("errorCount")){
+                        errorCount = bundle.getInt("errorCount");
+                    }
+                    bundle.putInt("errorCount", 0);
+                    if(errorCount >= 3){
+                        bundle.putString("channelId", "fusion-mute-0113");
+                        bundle.putString("title", "Server Connection Resumed: " + getMyPrettyDate(System.currentTimeMillis()));
+                        bundle.putString("message", "");
+                        bundle.putString("channelId", "fusion-mute-0113");   
+                        bundle.putString("subText", "");
+                        bundle.putString("smallIcon", isDarkThemeOn?"white": "black");
+                        handleLocalNotification(context, bundle);    
+                    }
                 }
                 else{
-                    bundle.putString("title", "Network Error: " + getMyPrettyDate(System.currentTimeMillis()));
-                    bundle.putString("message", "Error");
-                    bundle.putString("channelId", "fusion-mute-0113");   
-                    bundle.putString("smallIcon", isDarkThemeOn?"white": "black");
-                    handleLocalNotification(context, bundle);       
+                    int errorCount = 0;
+                    if(bundle.containsKey("errorCount")){
+                        errorCount = bundle.getInt("errorCount");
+                    }
+                    errorCount ++;
+                    bundle.putInt("errorCount", errorCount);
+                    if(errorCount == 3){
+                        bundle.putString("soundName", "normal.wav");
+                        bundle.putString("channelId", "fusion-sound-normal-0113");
+                        bundle.putString("title", "Server Connection Error: " + getMyPrettyDate(System.currentTimeMillis()));
+                        bundle.putString("message", "");
+                        bundle.putString("subText", "");
+                        bundle.putString("smallIcon", isDarkThemeOn?"white": "black");
+                        handleLocalNotification(context, bundle);    
+                    }
                 }
                 
                 bundle.putString("id", "2704246");
                 bundle.putString("title", "xyz");
+                bundle.putString("subText", "");
                 handleLocalNotification(context, bundle);
             }
         };
